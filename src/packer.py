@@ -8,7 +8,7 @@ def build_parser():
 	usage = 'usage: %prog [options]'
 	parser = OptionParser(usage)
 	parser.add_option('-i','--input',dest='input',help='input file')
-	parser.add_option('-o','--output',default='a.xvm',dest='output',help='output file')
+	parser.add_option('-o','--output',default='a.exe',dest='output',help='output file')
 	parser.add_option('-k','--key',default='0x41',dest='key',help='single byte key')
 	return parser
 
@@ -140,6 +140,9 @@ def main(argc, argv):
 	pe.sections[0].Characteristics  |= pefile.SECTION_CHARACTERISTICS["IMAGE_SCN_MEM_WRITE"]
 	#pe.sections[-1].Characteristics  |= pefile.SECTION_CHARACTERISTICS["IMAGE_SCN_MEM_EXECUTE"]
 	pe.write(filename=output)
+
+	os.remove('asm.bin')
+	os.remove('asm.asm')
 	info(pe)
 
 
