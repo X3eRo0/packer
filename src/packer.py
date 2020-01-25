@@ -1,5 +1,6 @@
 import pefile
 import sys
+import os
 import struct
 import subprocess
 from optparse import OptionParser
@@ -48,16 +49,27 @@ def gen_loader(new_sec,jmp_loc, clength, xlength, key, oep):
 		'add esi, {}\n'.format(hex(skip)),
 		'push esi\n',
 		'jmp ret_\n'
-		'mov si, si\n',
-		'mov esp, ebp\n',
-		'xchg edi, esi\n',
-		'mov cl, cl\n',
-		'xchg esi, edi\n',
-		'mov di, di\n',
-		'cpuid\n',
-		'mov ebx, AAAAAAA0\n',
-		'mov edx, AAAAAAA1\n',
-		'mov ecx, AAAAAAA2\n',
+		'xor eax, eax\n',
+		'mov eax, [fs:dword 30h]\n',
+		'mov eax, [eax+0x02]\n',
+		'and eax, 0xff\n',
+		'cmp eax, 0x00\n',
+		'jne sgflt\n',
+		'je run\n',
+		'sgflt:\n',
+		'\tpush 0x41414141\n',
+		'\tret\n',
+		'run:\n',
+		'\tmov si, si\n',
+		'\tmov esp, ebp\n',
+		'\txchg edi, esi\n',
+		'\tmov cl, cl\n',
+		'\txchg esi, edi\n',
+		'\tmov di, di\n',
+		'\tcpuid\n',
+		'\tmov ebx, AAAAAAA0\n',
+		'\tmov edx, AAAAAAA1\n',
+		'\tmov ecx, AAAAAAA2\n',
 		'copy_loop:\n',
 		'\tmov al, [ebx]\n',
 		'\tmov [edx], al\n',
